@@ -70,6 +70,10 @@ def delete_contact(name, filename="contacts.json"):
 
     return True;
 
+def dict_to_individual_vars(info): #another best name function
+    name, number, email, note = info["name"], info["number"], info["email"], info["note"]
+
+    return name, number, email, note
 
 def prettyprintinfo(dictofinfo):
     name, number, email, note = dictofinfo["name"], dictofinfo["number"], dictofinfo["email"], dictofinfo["note"]
@@ -97,7 +101,7 @@ def showall(contacts):
     return output;
 
 
-def insert(choice):
+def extract_info_from_user_input(choice): #best function name
     number, email, note = "unknown", "unknown", "unknown"
     listofinfo = choice.split(" ")
     listofinfo = [x for x in listofinfo if x != ""]
@@ -112,7 +116,7 @@ def insert(choice):
     except IndexError:
         pass
 
-    return name, number, email, note
+    return {"name": name, "number": number, "email": email, "note": note}
 
 
 
@@ -131,8 +135,8 @@ def main():
 
         elif "insert" in choice:
             try:
-
-                name, number, email, note = insert(choice)
+                info = extract_info_from_user_input(choice)
+                name, number, email, note = dict_to_individual_vars(info)
                 print(add_contact(name, number, email, note))
             except TypeError:
                 print("insert requires an argument")
@@ -141,7 +145,7 @@ def main():
         elif "remove" in choice:
             listofinfo = choice.split(" ")
             name = "".join([listofinfo[1]])
-            worked = delete_contact()
+            worked = delete_contact(name)
             if worked == True:
                 print(f"Done deleting contact {name}\n")
             else:
