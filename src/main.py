@@ -129,11 +129,6 @@ def extract_info_from_user_input(choice): #best function name
 
 
 
-def print_help():
-    print("\nshowall: shows all contacts\nshow (contactname): shows a specific contact\ninsert (contactname), optional(number), optional(email), optional(note): creates a new contact or updates an existing one\nremove (contactname): removes the specified contact\n\n")
-
-
-
 def check_command(choice, contacts):
     choicelist = choice.split(" ")
     match choicelist[0]:
