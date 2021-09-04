@@ -166,11 +166,11 @@ class Command:
         if contactlist == []:
             print("show requires at least 1 argument")
             return
-            worked = show(contacts, contactlist)
-            if not worked:
-                print(f"One or more of the contacts you specified don't exist.")
-                return
-            print(worked)
+        worked = show(contacts, contactlist)
+        if not worked:
+            print(f"One or more of the contacts you specified don't exist.")
+            return
+        print(worked)
 
 
     def remove(choice):
