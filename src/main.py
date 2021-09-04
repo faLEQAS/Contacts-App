@@ -5,11 +5,17 @@ import json
 
 
 def read_contacts():
-    with open("contacts.json", "r") as f:
-            contacts = json.loads(f.read())
+    try:
 
-            return contacts;
+        with open("contacts.json", "r") as f:
+                contacts = json.loads(f.read())
 
+                return contacts;
+    except (FileNotFoundError, json.decoder.JSONDecodeError):
+        write_contacts()
+        contacts = read_contacts()
+
+    return contacts;
 
 
 def write_contacts():
@@ -18,26 +24,15 @@ def write_contacts():
         json.dump(samplejson, f, indent=4)
 
     open_contacts()
-
-
-
-
-def open_contacts():
-    try:
-
-        contacts = read_contacts()
-    except (FileNotFoundError, json.decoder.JSONDecodeError):
-        write_contacts()
-        contacts = read_contacts() #tried calling open_contacts() again here but didn't work so i had to repeat myself.
-
-    return contacts;
     
 
 
 
 
-def add_contact(name, number, email, note):
+def add_contact(info):
     with open("contacts.json",'r') as file:
+
+        name, number, email, note = info["name"], info["number"], info["email"], info["note"]
 
         file_data = json.load(file)
 
@@ -50,9 +45,6 @@ def add_contact(name, number, email, note):
 
     with open("contacts.json","w") as file:
         json.dump(file_data, file, indent = 4)
-
-
-    return f"Done adding/updating contact {name}\n"
 
 
 
@@ -70,13 +62,6 @@ def delete_contact(name, filename="contacts.json"):
         json.dump(data, file, indent=4)
 
     return True;
-
-
-
-def dict_to_individual_vars(info): #another best name function
-    name, number, email, note = info["name"], info["number"], info["email"], info["note"]
-
-    return name, number, email, note
 
 
 
@@ -148,7 +133,7 @@ def check_command(choice, contacts):
 def main():
     print("\ntype in 'help' for info\n")
     while True:
-        contacts = open_contacts()
+        contacts = read_contacts()
         choice = input()
         check_command(choice, contacts)
 
@@ -161,16 +146,15 @@ class Command:
     def Insert(choice):
         info = extract_info_from_user_input(choice)
         if info != False:
-
-            name, number, email, note = dict_to_individual_vars(info)
-            print(add_contact(name, number, email, note))
+            name = info["name"]
+            add_contact(info)
+            print(f"done adding/updating contact {name}")
         else:
             print("Insert takes from 1 to 4 arguments\n")
 
     def show(choice, contacts):
         try:
             choicelist = choice.split(" ")
-            print(choicelist)
             contact = choicelist[1]
             worked = show(contacts, contact)
             if worked == False:
