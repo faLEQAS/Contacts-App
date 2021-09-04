@@ -73,24 +73,31 @@ def prettyprintinfo(dictofinfo):
 
 
 
-def show(contacts, contact=None):
-    try:
-        info = contacts[contact][0]
-    except KeyError:
-        return False
-    name, number, email, note = contact, info["number"], info["email"], info["additional info"]
+def show(contacts, contactlist=None):
+    output = ""
+    for contact in contactlist:
+        if contact in [" ", ""]:
+            continue
+        try:
+            info = contacts[contact][0]
+        except KeyError:
+            return contact
+        name, number, email, note = contact, info["number"], info["email"], info["additional info"]
 
-    dictofinfo = {"name": name, "number": number, "email": email, "note": note}
+        dictofinfo = {"name": name, "number": number, "email": email, "note": note}
 
-    return prettyprintinfo(dictofinfo)
+        output += prettyprintinfo(dictofinfo)
+
+    return output
 
 
 
 def showall(contacts):
-    output = """"""
+    contactlist = []
     for contact in contacts:
-        output += show(contacts, contact)
+        contactlist.append(contact)
 
+    output = show(contacts, contactlist)
     return output;
 
 
@@ -155,10 +162,10 @@ class Command:
     def show(choice, contacts):
         try:
             choicelist = choice.split(" ")
-            contact = choicelist[1]
-            worked = show(contacts, contact)
-            if worked == False:
-                print(f"No contact with the name {contact} exists.")
+            contactlist = choicelist[1:]
+            worked = show(contacts, contactlist)
+            if worked in contactlist:
+                print(f"No contact with the name {worked} exists.")
             else:
                 print(worked)
         except IndexError:
