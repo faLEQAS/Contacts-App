@@ -165,7 +165,7 @@ class Command:
         contactlist = [x for x in choicelist[1:] if x not in ["", " "]]
         if contactlist == []:
             print("show requires at least 1 argument")
-                return
+            return
             worked = show(contacts, contactlist)
             if not worked:
                 print(f"One or more of the contacts you specified don't exist.")
