@@ -81,7 +81,7 @@ def show(contacts, contactlist=None):
         try:
             info = contacts[contact][0]
         except KeyError:
-            return contact
+            return False
         name, number, email, note = contact, info["number"], info["email"], info["additional info"]
 
         dictofinfo = {"name": name, "number": number, "email": email, "note": note}
@@ -160,16 +160,18 @@ class Command:
             print("Insert takes from 1 to 4 arguments\n")
 
     def show(choice, contacts):
-        try:
-            choicelist = choice.split(" ")
-            contactlist = choicelist[1:]
+
+        choicelist = choice.split(" ")
+        contactlist = [x for x in choicelist[1:] if x not in ["", " "]]
+        if contactlist == []:
+            print("show requires at least 1 argument")
+                return
             worked = show(contacts, contactlist)
-            if worked in contactlist:
-                print(f"No contact with the name {worked} exists.")
-            else:
-                print(worked)
-        except IndexError:
-            print("show requires an argument")
+            if not worked:
+                print(f"One or more of the contacts you specified don't exist.")
+                return
+            print(worked)
+
 
     def remove(choice):
         listofinfo = choice.split(" ")
@@ -185,6 +187,7 @@ class Command:
             print("remove requires an argument\n")
 
         
+if __name__ == "__main__":
 
 
-main()
+    main()
