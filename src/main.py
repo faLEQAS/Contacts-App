@@ -32,31 +32,35 @@ def write_contacts():
 def add_contact(info):
     with open("contacts.json",'r') as file:
 
-        name, number, email, note = info["name"], info["number"], info["email"], info["note"]
-
         file_data = json.load(file)
 
-        file_data[name] = [{
-    "number": number,
-    "email": email,
-    "additional info": note
-}]
-        file.seek(0)
+        for contactinfo in info:
+
+
+            name, number, email, note = contactinfo["name"], contactinfo["number"], contactinfo["email"], contactinfo["note"]
+
+            file_data[name] = [{
+        "number": number,
+        "email": email,
+        "additional info": note
+    }]
+            file.seek(0)
 
     with open("contacts.json","w") as file:
         json.dump(file_data, file, indent = 4)
 
 
 
-def delete_contact(name, filename="contacts.json"):
+def delete_contact(names, filename="contacts.json"):
     with open(filename, "r") as file:
-
         data = json.load(file)
-        try:
+        for name in names:
 
-            data.pop(name)
-        except KeyError:
-            return False
+            try:
+
+                data.pop(name)
+            except KeyError:
+                return False
 
     with open(filename, "w") as file:
         json.dump(data, file, indent=4)
@@ -104,20 +108,26 @@ def showall(contacts):
 
 
 def extract_info_from_user_input(choice): #best function name
-    number, email, note = "unknown", "unknown", "unknown"
-    listofinfo = choice.split(" ")
-    listofinfo = [x for x in listofinfo if x != ""]
-    if len(listofinfo) > 5 or len(listofinfo) == 1:
-        return False
-    name = listofinfo[1]
-    try:
-        number = listofinfo[2]
-        email = listofinfo[3]
-        note = listofinfo[4]
-    except IndexError:
-        pass
+    listofinfo = choice.split(",")
+    listofcontact = []
+    for i in listofinfo:
+        number, email, note = "unknown", "unknown", "unknown"
+        i = i.split(" ")
+        i = [x for x in i if x not in ["", " ", "insert"]]
+        try:
+            name = i[0]
+        except IndexError:
+            return False
+        try:
+            number = i[1]
+            email = i[2]
+            note = i[3]
+        except IndexError:
+            pass
 
-    return {"name": name, "number": number, "email": email, "note": note}
+        listofcontact.append(({"name": name, "number": number, "email": email, "note": note}))
+
+    return listofcontact;
 
 
 
@@ -153,11 +163,10 @@ class Command:
     def Insert(choice):
         info = extract_info_from_user_input(choice)
         if info != False:
-            name = info["name"]
             add_contact(info)
-            print(f"done adding/updating contact {name}")
+            print(f"done adding/updating contact")
         else:
-            print("Insert takes from 1 to 4 arguments\n")
+            print("Insert requires at least 1 argument\n")
 
     def show(choice, contacts):
 
@@ -175,16 +184,18 @@ class Command:
 
     def remove(choice):
         listofinfo = choice.split(" ")
-        try:
 
-            name = "".join([listofinfo[1]])
-            worked = delete_contact(name)
-            if worked:
-                print(f"Done deleting contact {name}\n")
-            else:
-                print(f"No contact called {name} exists")
-        except IndexError:
-            print("remove requires an argument\n")
+        names = [i for i in listofinfo[1:] if i not in ["", " "]]
+        if names == []:
+            print("remove requires at least 1 argument")
+            return
+        worked = delete_contact(names)
+        if worked:
+            print(f"Done deleting contacts\n")
+            return
+
+        print(f"One or more of the contacts you specified don't exist.")
+
 
         
 if __name__ == "__main__":
