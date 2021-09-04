@@ -149,7 +149,7 @@ class Command:
     def showallcmd(contacts):
         print(showall(contacts))
     def help():
-        print("\nshowall: shows all contacts\nshow (contactname): shows a specific contact\ninsert (contactname), optional(number), optional(email), optional(note): creates a new contact or updates an existing one\nremove (contactname): removes the specified contact\n\n")
+        print("\nshowall: shows all contacts\nshow (contact1) (contact2)...: shows only specified contacts\ninsert (contactname), optional(number), optional(email), optional(note): creates a new contact or updates an existing one\nremove (contactname): removes the specified contact\n\n")
     def Insert(choice):
         info = extract_info_from_user_input(choice)
         if info != False:
@@ -177,7 +177,7 @@ class Command:
 
             name = "".join([listofinfo[1]])
             worked = delete_contact(name)
-            if worked == True:
+            if worked:
                 print(f"Done deleting contact {name}\n")
             else:
                 print(f"No contact called {name} exists")
