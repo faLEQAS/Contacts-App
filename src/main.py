@@ -4,50 +4,50 @@ import json
 
 
 
-def read_contacts():
+def get_contacts():
     try:
 
-        with open("contacts.json", "r") as f:
-                contacts = json.loads(f.read())
-
-                return contacts;
+        contacts = json_to_dict()
     except (FileNotFoundError, json.decoder.JSONDecodeError):
         write_contacts()
         contacts = read_contacts()
 
     return contacts;
 
+def json_to_dict():
+    with open("contacts.json", "r") as f:
+        data = json.loads(f.read())
 
-def write_contacts():
-    samplejson = {"SampleContact": [{"number": "7148729143", "email": "email@email.com", "additional info": "note"}]}
+        return data
+
+def read_json():
+    with open("contacts.json", "r") as f:
+        data = json.load(f)
+
+        return data;
+
+def write_contacts(data=None):
     with open("contacts.json", "w") as f:
-        json.dump(samplejson, f, indent=4)
-
-    open_contacts()
-    
-
-
+        if data == None:
+            data = {"SampleContact": [{"number": "7148729143", "email": "email@email.com", "additional info": "note"}]}
+        json.dump(data, f, indent=4)
 
 
 def add_contact(info):
-    with open("contacts.json",'r') as file:
+    data = read_json()
 
-        file_data = json.load(file)
-
-        for contactinfo in info:
+    for contactinfo in info:
 
 
-            name, number, email, note = contactinfo["name"], contactinfo["number"], contactinfo["email"], contactinfo["note"]
+        name, number, email, note = contactinfo["name"], contactinfo["number"], contactinfo["email"], contactinfo["note"]
 
-            file_data[name] = [{
+        data[name] = [{
         "number": number,
         "email": email,
         "additional info": note
-    }]
-            file.seek(0)
+        }]
 
-    with open("contacts.json","w") as file:
-        json.dump(file_data, file, indent = 4)
+    write_contacts(data)
 
 
 
@@ -133,57 +133,65 @@ def extract_info_from_user_input(choice): #best function name
 
 def check_command(choice, contacts):
     choicelist = choice.split(" ")
+    cmd = Command(choice, contacts)
     match choicelist[0]:
         case "insert":
-            Command.Insert(choice)
+            cmd.insert()
         case "remove":
-            Command.remove(choice)
+            cmd.remove()
         case "show":
-            Command.show(choice, contacts)
+            cmd.show()
         case "help":
-            Command.help()
+            cmd.help()
         case "showall":
-            Command.showallcmd(contacts)
+            cmd.showallcmd()
         case _:
             print("\nInvalid Command.")
 
 def main():
     print("\ntype in 'help' for info\n")
     while True:
-        contacts = read_contacts()
+        contacts = get_contacts()
         choice = input()
         check_command(choice, contacts)
 
 
 class Command:
-    def showallcmd(contacts):
-        print(showall(contacts))
+
+    def __init__(self, choice, contacts):
+        self.choice = choice
+        self.contacts = contacts
+
+    @staticmethod
     def help():
         print("\nshowall: shows all contacts\nshow (contact1) (contact2)...: shows only specified contacts\ninsert (contactname), optional(number), optional(email), optional(note): creates a new contact or updates an existing one\nremove (contactname): removes the specified contact\n\n")
-    def Insert(choice):
-        info = extract_info_from_user_input(choice)
+
+    def showallcmd(self):
+        print(showall(self.contacts))
+
+    def insert(self):
+        info = extract_info_from_user_input(self.choice)
         if info != False:
             add_contact(info)
             print(f"done adding/updating contact")
         else:
             print("Insert requires at least 1 argument\n")
 
-    def show(choice, contacts):
+    def show(self):
 
-        choicelist = choice.split(" ")
+        choicelist = self.choice.split(" ")
         contactlist = [x for x in choicelist[1:] if x not in ["", " "]]
         if contactlist == []:
             print("show requires at least 1 argument")
             return
-        worked = show(contacts, contactlist)
+        worked = show(self.contacts, contactlist)
         if not worked:
             print(f"One or more of the contacts you specified don't exist.")
             return
         print(worked)
 
-
-    def remove(choice):
-        listofinfo = choice.split(" ")
+    def remove(self):
+        listofinfo = self.choice.split(" ")
 
         names = [i for i in listofinfo[1:] if i not in ["", " "]]
         if names == []:
